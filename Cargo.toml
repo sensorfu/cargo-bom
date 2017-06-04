@@ -1,0 +1,14 @@
+[package]
+name = "cargo-bom"
+version = "0.1.0"
+authors = [ "Ossi Herrala <oherrala@iki.fi>" ]
+license = "MIT"
+
+description = "Bill of Materials for Rust Crates"
+homepage = "https://github.com/sensorfu/cargo-bom#readme"
+repository = "https://github.com/sensorfu/cargo-bom"
+readme = "README.md"
+
+[dependencies]
+cargo = "0.18.0"
+rustc-serialize = "0.3.24"
