@@ -126,8 +126,8 @@ fn package_licenses(package: &Package) -> Licenses {
             .split('/')
             .map(|s| s.trim().to_owned())
             .collect();
-        licenses.dedup();
         licenses.sort();
+        licenses.dedup();
         return Licenses::Licenses(licenses);
     }
 
