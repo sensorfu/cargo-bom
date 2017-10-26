@@ -48,7 +48,7 @@ Usage:
 Options:
     -h, --help               Print this message
     -V, --version            Print version information
-    -v, --verbose ...        Use verbose output    
+    -v, --verbose ...        Use verbose output
     --frozen                 Require Cargo.lock and cache are up to date
     --locked                 Require Cargo.lock is up to date
     --color WHEN             Coloring: auto, always, never
@@ -59,26 +59,28 @@ project depends on.
 fn main() {
     let config = Config::default().expect("cargo config");
     let args: Vec<String> = env::args().collect();
-    
+
     let res = cargo::call_main_without_stdin(real_main, &config, USAGE_STR, &args, false);
     if let Err(e) = res {
         cargo::exit_with_error(e, &mut *config.shell());
-    }    
+    }
 }
 
 fn real_main(options: Options, config: &Config) -> cargo::CliResult {
-    config.configure(options.flag_verbose,
-                     options.flag_quiet,
-                     &options.flag_color,
-                     options.flag_frozen,
-                     options.flag_locked,
-                     &options.flag_unstable)?;
+    config.configure(
+        options.flag_verbose,
+        options.flag_quiet,
+        &options.flag_color,
+        options.flag_frozen,
+        options.flag_locked,
+        &options.flag_unstable,
+    )?;
 
     let manifest = config.cwd().join("Cargo.toml");
     let ws = Workspace::new(&manifest, config)?;
     let (package_ids, resolve) = ops::resolve_ws(&ws)?;
 
-    let mut packages: Vec<(String, String, String, Vec<path::PathBuf>)> = Vec::new();
+    let mut packages = Vec::new();
     let mut longest_name = 0;
     for package_id in resolve.iter() {
         let package = package_ids.get(package_id)?;
@@ -138,7 +140,7 @@ fn package_licenses(package: &Package) -> Licenses {
 
     if let Some(ref license_file) = metadata.license_file {
         return Licenses::File(license_file.to_owned());
-    } 
+    }
 
     Licenses::Missing
 }
