@@ -1,4 +1,5 @@
 extern crate cargo;
+extern crate tabwriter;
 
 extern crate serde;
 #[macro_use]
@@ -11,8 +12,9 @@ use cargo::util::Config;
 
 use std::env;
 use std::fmt;
+use std::io;
+use std::io::prelude::*;
 use std::path;
-use std::io::Read;
 
 #[derive(Deserialize)]
 struct Options {
@@ -81,25 +83,26 @@ fn real_main(options: Options, config: &Config) -> cargo::CliResult {
     let (package_ids, resolve) = ops::resolve_ws(&ws)?;
 
     let mut packages = Vec::new();
-    let mut longest_name = 0;
     for package_id in resolve.iter() {
         let package = package_ids.get(package_id)?;
         let name = package.name().to_owned();
         let version = format!("{}", package.version());
         let licenses = format!("{}", package_licenses(package));
         let license_files = package_license_files(package);
-        longest_name = std::cmp::max(longest_name, name.len());
         packages.push((name, version, licenses, license_files));
     }
 
     packages.sort();
 
-    right_pad_print(longest_name, "Name", "Version", "Licenses");
-    println!("{:-<80}", "");
+    let mut tw = tabwriter::TabWriter::new(io::stdout());
+
+    writeln!(tw, "Name\t| Version\t| Licenses").expect("write");
 
     for (name, version, licenses, _) in packages.clone() {
-        right_pad_print(longest_name, &name, &version, &licenses);
+        writeln!(tw, "{}\t| {}\t| {}", &name, &version, &licenses).expect("write");
     }
+
+    tw.flush().expect("tw.flush"); // TabWriter flush() makes the actual write to stdout.
 
     println!("");
 
@@ -161,16 +164,4 @@ fn package_license_files(package: &Package) -> Vec<path::PathBuf> {
     }
 
     result
-}
-
-fn right_pad_print(longest_name: usize, name: &str, version: &str, licenses: &str) {
-    if longest_name <= 8 {
-        println!("{:<8} | {:<8} | {}", name, version, licenses);
-    } else if longest_name <= 16 {
-        println!("{:<16} | {:<8} | {}", name, version, licenses);
-    } else if longest_name <= 24 {
-        println!("{:<24} | {:<8} | {}", name, version, licenses);
-    } else {
-        println!("{:<32} | {:<8} | {}", name, version, licenses);
-    }
 }
