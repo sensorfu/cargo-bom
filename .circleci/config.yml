@@ -1,0 +1,25 @@
+
+version: 2
+jobs:
+  build:
+    docker:
+      - image: rust:latest
+    steps:
+      - checkout
+      - run:
+          name: install_deps
+          command: |
+            apt -y update
+            apt -y install cmake
+      - run:
+          name: install_rust_toolchains
+          command: |
+            rustup update
+            rustup install beta
+            rustup install nightly || rustup install nightly-$(date --date="@$(expr $(date +%s) - 86000)" '+%F') || true
+      - run:
+          name: run_tests
+          command: |
+            cargo test
+            cargo +beta test
+            cargo +nightly test
