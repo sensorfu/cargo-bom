@@ -1,5 +1,8 @@
 extern crate cargo;
-extern crate rustc_serialize;
+
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 
 use cargo::core::Package;
 use cargo::core::Workspace;
@@ -11,13 +14,14 @@ use std::fmt;
 use std::path;
 use std::io::Read;
 
-#[derive(RustcDecodable)]
+#[derive(Deserialize)]
 struct Options {
     flag_verbose: u32,
     flag_quiet: Option<bool>,
     flag_color: Option<String>,
     flag_frozen: bool,
     flag_locked: bool,
+    flag_unstable: Vec<String>,
 }
 
 #[derive(Debug)]
@@ -67,7 +71,8 @@ fn real_main(options: Options, config: &Config) -> cargo::CliResult {
                      options.flag_quiet,
                      &options.flag_color,
                      options.flag_frozen,
-                     options.flag_locked)?;
+                     options.flag_locked,
+                     &options.flag_unstable)?;
 
     let manifest = config.cwd().join("Cargo.toml");
     let ws = Workspace::new(&manifest, config)?;
