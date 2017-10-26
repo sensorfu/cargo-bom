@@ -80,11 +80,16 @@ fn real_main(options: Options, config: &Config) -> cargo::CliResult {
 
     let manifest = config.cwd().join("Cargo.toml");
     let ws = Workspace::new(&manifest, config)?;
+    let members: Vec<&Package> = ws.members().collect();
     let (package_ids, resolve) = ops::resolve_ws(&ws)?;
 
     let mut packages = Vec::new();
     for package_id in resolve.iter() {
         let package = package_ids.get(package_id)?;
+        if members.contains(&package) {
+            // Skip listing our own packages in our workspace
+            continue;
+        }
         let name = package.name().to_owned();
         let version = format!("{}", package.version());
         let licenses = format!("{}", package_licenses(package));
