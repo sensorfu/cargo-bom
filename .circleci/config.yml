@@ -42,13 +42,13 @@ workflows:
   run-tests:
     jobs:
       - install-deps
-      - test-rust-stable:
+      - rust-test-stable:
           requires:
             - install-deps
-      - test-rust-beta:
+      - rust-test-beta:
           requires:
             - install-deps
-      - test-rust-nightly:
+      - rust-test-nightly:
           requires:
             - install-deps
 
