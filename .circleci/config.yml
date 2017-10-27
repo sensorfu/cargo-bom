@@ -1,7 +1,8 @@
 
 version: 2
 jobs:
-  build:
+
+  install-deps:
     docker:
       - image: rust:latest
     steps:
@@ -17,6 +18,37 @@ jobs:
             rustup update
             rustup install beta
             rustup install nightly || rustup install nightly-$(date --date="@$(expr $(date +%s) - 86000)" '+%F') || true
+
+  rust-test-stable:
+    docker:
+      - image: rust:latest
+    steps:
       - run: cargo test
+
+  rust-test-beta:
+    docker:
+      - image: rust:latest
+    steps:
       - run: cargo +beta test
+
+  rust-test-nightly:
+    docker:
+      - image: rust:latest
+    steps:
       - run: cargo +nightly test
+
+workflows:
+  version: 2
+  run-tests:
+    jobs:
+      - install-deps
+      - test-rust-stable:
+          requires:
+            - install-deps
+      - test-rust-beta:
+          requires:
+            - install-deps
+      - test-rust-nightly:
+          requires:
+            - install-deps
+
