@@ -9,6 +9,12 @@ homepage = "https://github.com/sensorfu/cargo-bom#readme"
 repository = "https://github.com/sensorfu/cargo-bom"
 readme = "README.md"
 
+categories = ["command-line-utilities", "development-tools", "development-tools::cargo-plugins"]
+keywords = ["bom", "bill-of-materials", "ingredients", "dependencies", "deps"]
+
+[badges]
+circle-ci = { repository = "sensorfu/cargo-bom", branch = "master" }
+
 [profile.release]
 lto = true
 
