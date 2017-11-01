@@ -43,7 +43,7 @@ impl fmt::Display for Licenses {
     }
 }
 
-const USAGE_STR: &'static str = r#"
+const USAGE_STR: &str = r#"
 Produce Bill of Materials from Cargo project's depencies
 Usage:
     cargo bom [options]
@@ -109,7 +109,7 @@ fn real_main(options: Options, config: &Config) -> cargo::CliResult {
 
     tw.flush().expect("tw.flush"); // TabWriter flush() makes the actual write to stdout.
 
-    println!("");
+    println!();
 
     for (name, version, _, license_files) in packages {
         if license_files.is_empty() {
@@ -127,7 +127,7 @@ fn real_main(options: Options, config: &Config) -> cargo::CliResult {
         }
 
         println!("-----END {} {} LICENSES-----", name, version);
-        println!("");
+        println!();
     }
 
     Ok(())
