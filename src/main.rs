@@ -59,16 +59,16 @@ project depends on.
 "#;
 
 fn main() {
-    let config = Config::default().expect("cargo config");
+    let mut config = Config::default().expect("cargo config");
     let args: Vec<String> = env::args().collect();
 
-    let res = cargo::call_main_without_stdin(real_main, &config, USAGE_STR, &args, false);
+    let res = cargo::call_main_without_stdin(real_main, &mut config, USAGE_STR, &args, false);
     if let Err(e) = res {
         cargo::exit_with_error(e, &mut *config.shell());
     }
 }
 
-fn real_main(options: Options, config: &Config) -> cargo::CliResult {
+fn real_main(options: Options, config: &mut Config) -> cargo::CliResult {
     config.configure(
         options.flag_verbose,
         options.flag_quiet,
