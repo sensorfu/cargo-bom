@@ -19,7 +19,7 @@ circle-ci = { repository = "sensorfu/cargo-bom", branch = "master" }
 lto = true
 
 [dependencies]
-cargo = "0.23.0"
+cargo = "0.24.0"
 serde = "1.0.17"
 serde_derive = "1.0.17"
 tabwriter = "1.0.3"
