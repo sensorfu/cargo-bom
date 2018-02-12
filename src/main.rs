@@ -36,10 +36,11 @@ enum Licenses {
 impl fmt::Display for Licenses {
     fn fmt(self: &Self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
-            Licenses::File(_) => Ok(write!(f, "Specified in license file")?),
-            Licenses::Missing => Ok(write!(f, "Missing")?),
-            Licenses::Licenses(ref lic_names) => Ok(write!(f, "{}", lic_names.join(", "))?),
+            Licenses::File(_) => write!(f, "Specified in license file")?,
+            Licenses::Missing => write!(f, "Missing")?,
+            Licenses::Licenses(ref lic_names) => write!(f, "{}", lic_names.join(", "))?,
         }
+        Ok(())
     }
 }
 
