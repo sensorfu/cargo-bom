@@ -1,92 +1,48 @@
 extern crate cargo;
 extern crate tabwriter;
 
-extern crate serde;
-#[macro_use]
-extern crate serde_derive;
-
 use cargo::core::Package;
 use cargo::core::Workspace;
 use cargo::ops;
 use cargo::util::Config;
 
-use std::env;
+use std::collections::BTreeSet;
 use std::fmt;
 use std::io;
 use std::io::prelude::*;
 use std::path;
 
-#[derive(Deserialize)]
-struct Options {
-    flag_verbose: u32,
-    flag_quiet: Option<bool>,
-    flag_color: Option<String>,
-    flag_frozen: bool,
-    flag_locked: bool,
-    flag_unstable: Vec<String>,
-}
-
 #[derive(Debug)]
-enum Licenses {
-    Licenses(Vec<String>),
+enum Licenses<'a> {
+    Licenses(BTreeSet<&'a str>),
     File(String),
     Missing,
 }
 
-impl fmt::Display for Licenses {
-    fn fmt(self: &Self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+impl<'a> fmt::Display for Licenses<'a> {
+    fn fmt(self: &Self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match *self {
             Licenses::File(_) => write!(f, "Specified in license file")?,
             Licenses::Missing => write!(f, "Missing")?,
-            Licenses::Licenses(ref lic_names) => write!(f, "{}", lic_names.join(", "))?,
+            Licenses::Licenses(ref lic_names) => {
+                let lics: Vec<String> = lic_names.iter().map(|s| String::from(*s)).collect();
+                write!(f, "{}", lics.join(", "))?
+            }
         }
         Ok(())
     }
 }
 
-const USAGE_STR: &str = r#"
-Produce Bill of Materials from Cargo project's depencies
-Usage:
-    cargo bom [options]
-Options:
-    -h, --help               Print this message
-    -V, --version            Print version information
-    -v, --verbose ...        Use verbose output
-    --frozen                 Require Cargo.lock and cache are up to date
-    --locked                 Require Cargo.lock is up to date
-    --color WHEN             Coloring: auto, always, never
-This cargo subcommand will produce Bill of Materials (BOM) from crates the
-project depends on.
-"#;
-
 fn main() {
-    let mut config = Config::default().expect("cargo config");
-    let args: Vec<String> = env::args().collect();
-
-    let res = cargo::call_main_without_stdin(real_main, &mut config, USAGE_STR, &args, false);
-    if let Err(e) = res {
-        cargo::exit_with_error(e, &mut *config.shell());
-    }
-}
-
-fn real_main(options: Options, config: &mut Config) -> cargo::CliResult {
-    config.configure(
-        options.flag_verbose,
-        options.flag_quiet,
-        &options.flag_color,
-        options.flag_frozen,
-        options.flag_locked,
-        &options.flag_unstable,
-    )?;
-
+    let config = Config::default().expect("cargo config");
     let manifest = config.cwd().join("Cargo.toml");
-    let ws = Workspace::new(&manifest, config)?;
+    let ws = Workspace::new(&manifest, &config).expect("cargo workspace");
     let members: Vec<&Package> = ws.members().collect();
-    let (package_ids, resolve) = ops::resolve_ws(&ws)?;
+    let (package_ids, resolve) = ops::resolve_ws(&ws).expect("resolve workspace");
 
     let mut packages = Vec::new();
     for package_id in resolve.iter() {
-        let package = package_ids.get(package_id)?;
+        let package = package_ids.get(package_id).expect("get package ids");
         if members.contains(&package) {
             // Skip listing our own packages in our workspace
             continue;
@@ -100,15 +56,17 @@ fn real_main(options: Options, config: &mut Config) -> cargo::CliResult {
 
     packages.sort();
 
-    let mut tw = tabwriter::TabWriter::new(io::stdout());
+    let stdout = io::stdout();
+    let mut out = stdout.lock();
 
-    writeln!(tw, "Name\t| Version\t| Licenses").expect("write");
-
-    for (name, version, licenses, _) in packages.clone() {
-        writeln!(tw, "{}\t| {}\t| {}", &name, &version, &licenses).expect("write");
+    {
+        let mut tw = tabwriter::TabWriter::new(&mut out);
+        writeln!(tw, "Name\t| Version\t| Licenses").expect("write");
+        for (name, version, licenses, _) in packages.clone() {
+            writeln!(tw, "{}\t| {}\t| {}", &name, &version, &licenses).expect("write");
+        }
+        tw.flush().expect("tw.flush"); // TabWriter flush() makes the actual write to stdout.
     }
-
-    tw.flush().expect("tw.flush"); // TabWriter flush() makes the actual write to stdout.
 
     println!();
 
@@ -119,31 +77,27 @@ fn real_main(options: Options, config: &mut Config) -> cargo::CliResult {
 
         println!("-----BEGIN {} {} LICENSES-----", name, version);
 
-        let mut buf = String::new();
+        let mut buf = Vec::new();
         for file in license_files {
             let mut fs = std::fs::File::open(file).expect("File::open");
-            fs.read_to_string(&mut buf).expect("read_to_string");
-            println!("{}", buf);
+            fs.read_to_end(&mut buf).expect("read_to_end");
+            out.write_all(&buf).expect("write_all");
             buf.clear();
         }
 
         println!("-----END {} {} LICENSES-----", name, version);
         println!();
     }
-
-    Ok(())
 }
 
 fn package_licenses(package: &Package) -> Licenses {
     let metadata = package.manifest().metadata();
 
     if let Some(ref license_str) = metadata.license {
-        let mut licenses: Vec<String> = license_str
+        let mut licenses: BTreeSet<&str> = license_str
             .split('/')
-            .map(|s| s.trim().to_owned())
+            .map(|s| s.trim())
             .collect();
-        licenses.sort();
-        licenses.dedup();
         return Licenses::Licenses(licenses);
     }
 
