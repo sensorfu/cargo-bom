@@ -90,7 +90,7 @@ fn main() {
     }
 }
 
-fn package_licenses(package: &Package) -> Licenses {
+fn package_licenses(package: &Package) -> Licenses<'_> {
     let metadata = package.manifest().metadata();
 
     if let Some(ref license_str) = metadata.license {
