@@ -57,6 +57,7 @@ fn main() {
     {
         let mut tw = tabwriter::TabWriter::new(&mut out);
         writeln!(tw, "Name\t| Version\t| Licenses").expect("write");
+        writeln!(tw, "----\t| -------\t| --------").expect("write");
         for (name, version, licenses, _) in packages.clone() {
             writeln!(tw, "{}\t| {}\t| {}", &name, &version, &licenses).expect("write");
         }
