@@ -1,8 +1,4 @@
-extern crate cargo;
-extern crate tabwriter;
-
-use cargo::core::Package;
-use cargo::core::Workspace;
+use cargo::core::{Package, Workspace};
 use cargo::ops;
 use cargo::util::Config;
 
@@ -42,7 +38,7 @@ fn main() {
 
     let mut packages = Vec::new();
     for package_id in resolve.iter() {
-        let package = package_ids.get(package_id).expect("get package ids");
+        let package = package_ids.get_one(package_id).expect("get package ids");
         if members.contains(&package) {
             // Skip listing our own packages in our workspace
             continue;
@@ -94,7 +90,7 @@ fn package_licenses(package: &Package) -> Licenses<'_> {
     let metadata = package.manifest().metadata();
 
     if let Some(ref license_str) = metadata.license {
-        let mut licenses: BTreeSet<&str> = license_str
+        let licenses: BTreeSet<&str> = license_str
             .split('/')
             .map(|s| s.trim())
             .collect();
