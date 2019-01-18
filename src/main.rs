@@ -1,8 +1,4 @@
-extern crate cargo;
-extern crate tabwriter;
-
-use cargo::core::Package;
-use cargo::core::Workspace;
+use cargo::core::{Package, Workspace};
 use cargo::ops;
 use cargo::util::Config;
 
@@ -15,21 +11,20 @@ use std::path;
 #[derive(Debug)]
 enum Licenses<'a> {
     Licenses(BTreeSet<&'a str>),
-    File(String),
+    File(&'a str),
     Missing,
 }
 
 impl<'a> fmt::Display for Licenses<'a> {
     fn fmt(self: &Self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match *self {
-            Licenses::File(_) => write!(f, "Specified in license file")?,
-            Licenses::Missing => write!(f, "Missing")?,
+            Licenses::File(_) => write!(f, "Specified in license file"),
+            Licenses::Missing => write!(f, "Missing"),
             Licenses::Licenses(ref lic_names) => {
                 let lics: Vec<String> = lic_names.iter().map(|s| String::from(*s)).collect();
-                write!(f, "{}", lics.join(", "))?
+                write!(f, "{}", lics.join(", "))
             }
         }
-        Ok(())
     }
 }
 
@@ -42,7 +37,7 @@ fn main() {
 
     let mut packages = Vec::new();
     for package_id in resolve.iter() {
-        let package = package_ids.get(package_id).expect("get package ids");
+        let package = package_ids.get_one(package_id).expect("get package ids");
         if members.contains(&package) {
             // Skip listing our own packages in our workspace
             continue;
@@ -62,6 +57,7 @@ fn main() {
     {
         let mut tw = tabwriter::TabWriter::new(&mut out);
         writeln!(tw, "Name\t| Version\t| Licenses").expect("write");
+        writeln!(tw, "----\t| -------\t| --------").expect("write");
         for (name, version, licenses, _) in packages.clone() {
             writeln!(tw, "{}\t| {}\t| {}", &name, &version, &licenses).expect("write");
         }
@@ -94,7 +90,7 @@ fn package_licenses(package: &Package) -> Licenses<'_> {
     let metadata = package.manifest().metadata();
 
     if let Some(ref license_str) = metadata.license {
-        let mut licenses: BTreeSet<&str> = license_str
+        let licenses: BTreeSet<&str> = license_str
             .split('/')
             .map(|s| s.trim())
             .collect();
@@ -102,7 +98,7 @@ fn package_licenses(package: &Package) -> Licenses<'_> {
     }
 
     if let Some(ref license_file) = metadata.license_file {
-        return Licenses::File(license_file.to_owned());
+        return Licenses::File(license_file);
     }
 
     Licenses::Missing
