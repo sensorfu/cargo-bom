@@ -11,21 +11,20 @@ use std::path;
 #[derive(Debug)]
 enum Licenses<'a> {
     Licenses(BTreeSet<&'a str>),
-    File(String),
+    File(&'a str),
     Missing,
 }
 
 impl<'a> fmt::Display for Licenses<'a> {
     fn fmt(self: &Self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match *self {
-            Licenses::File(_) => write!(f, "Specified in license file")?,
-            Licenses::Missing => write!(f, "Missing")?,
+            Licenses::File(_) => write!(f, "Specified in license file"),
+            Licenses::Missing => write!(f, "Missing"),
             Licenses::Licenses(ref lic_names) => {
                 let lics: Vec<String> = lic_names.iter().map(|s| String::from(*s)).collect();
-                write!(f, "{}", lics.join(", "))?
+                write!(f, "{}", lics.join(", "))
             }
         }
-        Ok(())
     }
 }
 
@@ -98,7 +97,7 @@ fn package_licenses(package: &Package) -> Licenses<'_> {
     }
 
     if let Some(ref license_file) = metadata.license_file {
-        return Licenses::File(license_file.to_owned());
+        return Licenses::File(license_file);
     }
 
     Licenses::Missing
