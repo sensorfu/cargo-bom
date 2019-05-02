@@ -4,9 +4,10 @@ use cargo::util::Config;
 
 use std::collections::BTreeSet;
 use std::fmt;
-use std::io;
 use std::io::prelude::*;
+use std::io;
 use std::path;
+use std::str;
 
 #[derive(Debug)]
 enum Licenses<'a> {
@@ -92,7 +93,7 @@ fn package_licenses(package: &Package) -> Licenses<'_> {
     if let Some(ref license_str) = metadata.license {
         let licenses: BTreeSet<&str> = license_str
             .split('/')
-            .map(|s| s.trim())
+            .map(str::trim)
             .collect();
         return Licenses::Licenses(licenses);
     }
