@@ -4,8 +4,8 @@ use cargo::util::Config;
 
 use std::collections::BTreeSet;
 use std::fmt;
-use std::io::prelude::*;
 use std::io;
+use std::io::prelude::*;
 use std::path;
 use std::str;
 
@@ -77,11 +77,16 @@ fn main() -> Result<(), Error> {
         println!("-----BEGIN {} {} LICENSES-----", name, version);
 
         let mut buf = Vec::new();
+        let mut licenses_to_print = license_files.len();
         for file in license_files {
             let mut fs = std::fs::File::open(file)?;
             fs.read_to_end(&mut buf)?;
             out.write_all(&buf)?;
             buf.clear();
+            if licenses_to_print > 1 {
+                out.write_all(b"\n-----NEXT LICENSE-----\n")?;
+                licenses_to_print -= 1;
+            }
         }
 
         println!("-----END {} {} LICENSES-----", name, version);
@@ -109,6 +114,11 @@ fn package_licenses(package: &Package) -> Licenses<'_> {
     Licenses::Missing
 }
 
+static LICENCE_FILE_NAMES: &[&str] = &[
+    "LICENSE",
+    "UNLICENSE",
+];
+
 fn package_license_files(package: &Package) -> io::Result<Vec<path::PathBuf>> {
     let mut result = Vec::new();
 
@@ -116,8 +126,10 @@ fn package_license_files(package: &Package) -> io::Result<Vec<path::PathBuf>> {
         for entry in path.read_dir()? {
             if let Ok(entry) = entry {
                 if let Ok(name) = entry.file_name().into_string() {
-                    if name.starts_with("LICENSE") {
-                        result.push(entry.path())
+                    for license_name in LICENCE_FILE_NAMES {
+                        if name.starts_with(license_name) {
+                            result.push(entry.path())
+                        }
                     }
                 }
             }
