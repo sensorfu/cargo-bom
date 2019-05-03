@@ -11,24 +11,25 @@ This tool (`cargo bom`) can be used to construct Bill of Materials for software
 using [Cargo](http://doc.crates.io/) package manager.
 
 The output of `cargo bom` has two sections. First it prints out a table with all
-dependencies, version numbers and names of licenses. Then it prints all license
-texts found from depended projects (files matching glob "LICENSE*").
+top level dependencies, version numbers and names of licenses. Then it prints
+all license texts found from depended projects (files matching globs "LICENSE*"
+and "UNLICENSE*").
 
 ## Example usage
 
 ```console
 $ cargo bom >BOM.txt
-$ head BOM.txt 
-Name                    | Version  | Licenses
-advapi32-sys            | 0.2.0    | MIT
-aho-corasick            | 0.6.3    | MIT, Unlicense
-atty                    | 0.2.3    | MIT
-backtrace               | 0.3.3    | Apache-2.0, MIT
-backtrace-sys           | 0.1.16   | Apache-2.0, MIT
-bitflags                | 0.7.0    | Apache-2.0, MIT
-bitflags                | 0.9.1    | Apache-2.0, MIT
-cargo                   | 0.22.0   | Apache-2.0, MIT
-cc                      | 1.0.2    | Apache-2.0, MIT
+$ head BOM.txt
+Name       | Version  | Licenses
+----       | -------  | --------
+cargo      | 0.35.0   | Apache-2.0, MIT
+failure    | 0.1.5    | Apache-2.0, MIT
+structopt  | 0.2.15   | Apache-2.0, MIT
+tabwriter  | 1.1.0    | MIT, Unlicense
+
+-----BEGIN cargo 0.35.0 LICENSES-----
+The Cargo source code itself does not bundle any third party libraries, but it
+depends on a number of libraries which carry their own copyright notices and
 ```
 
 # Bill of Materials
