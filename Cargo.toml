@@ -1,6 +1,6 @@
 [package]
 name = "cargo-bom"
-version = "0.3.1"
+version = "0.4.0"
 authors = [ "Ossi Herrala <oherrala@iki.fi>" ]
 license = "MIT"
 edition = "2018"
@@ -22,4 +22,5 @@ lto = true
 [dependencies]
 cargo = "0.35"
 failure = "0.1"
+structopt = "0.2"
 tabwriter = "1"
