@@ -21,4 +21,5 @@ lto = true
 
 [dependencies]
 cargo = "0.35"
+failure = "0.1"
 tabwriter = "1"

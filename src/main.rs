@@ -29,16 +29,16 @@ impl<'a> fmt::Display for Licenses<'a> {
     }
 }
 
-fn main() {
-    let config = Config::default().expect("cargo config");
+fn main() -> Result<(), Error> {
+    let config = Config::default()?;
     let manifest = config.cwd().join("Cargo.toml");
-    let ws = Workspace::new(&manifest, &config).expect("cargo workspace");
+    let ws = Workspace::new(&manifest, &config)?;
     let members: Vec<&Package> = ws.members().collect();
-    let (package_ids, resolve) = ops::resolve_ws(&ws).expect("resolve workspace");
+    let (package_ids, resolve) = ops::resolve_ws(&ws)?;
 
     let mut packages = Vec::new();
     for package_id in resolve.iter() {
-        let package = package_ids.get_one(package_id).expect("get package ids");
+        let package = package_ids.get_one(package_id)?;
         if members.contains(&package) {
             // Skip listing our own packages in our workspace
             continue;
@@ -46,7 +46,7 @@ fn main() {
         let name = package.name().to_owned();
         let version = format!("{}", package.version());
         let licenses = format!("{}", package_licenses(package));
-        let license_files = package_license_files(package);
+        let license_files = package_license_files(package)?;
         packages.push((name, version, licenses, license_files));
     }
 
@@ -57,12 +57,14 @@ fn main() {
 
     {
         let mut tw = tabwriter::TabWriter::new(&mut out);
-        writeln!(tw, "Name\t| Version\t| Licenses").expect("write");
-        writeln!(tw, "----\t| -------\t| --------").expect("write");
-        for (name, version, licenses, _) in packages.clone() {
-            writeln!(tw, "{}\t| {}\t| {}", &name, &version, &licenses).expect("write");
+        writeln!(tw, "Name\t| Version\t| Licenses")?;
+        writeln!(tw, "----\t| -------\t| --------")?;
+        for (name, version, licenses, _) in &packages {
+            writeln!(tw, "{}\t| {}\t| {}", &name, &version, &licenses)?;
         }
-        tw.flush().expect("tw.flush"); // TabWriter flush() makes the actual write to stdout.
+
+        // TabWriter flush() makes the actual write to stdout.
+        tw.flush()?;
     }
 
     println!();
@@ -76,15 +78,17 @@ fn main() {
 
         let mut buf = Vec::new();
         for file in license_files {
-            let mut fs = std::fs::File::open(file).expect("File::open");
-            fs.read_to_end(&mut buf).expect("read_to_end");
-            out.write_all(&buf).expect("write_all");
+            let mut fs = std::fs::File::open(file)?;
+            fs.read_to_end(&mut buf)?;
+            out.write_all(&buf)?;
             buf.clear();
         }
 
         println!("-----END {} {} LICENSES-----", name, version);
         println!();
     }
+
+    Ok(())
 }
 
 fn package_licenses(package: &Package) -> Licenses<'_> {
@@ -105,11 +109,11 @@ fn package_licenses(package: &Package) -> Licenses<'_> {
     Licenses::Missing
 }
 
-fn package_license_files(package: &Package) -> Vec<path::PathBuf> {
+fn package_license_files(package: &Package) -> io::Result<Vec<path::PathBuf>> {
     let mut result = Vec::new();
 
     if let Some(path) = package.manifest_path().parent() {
-        for entry in path.read_dir().expect("read_dir call failed") {
+        for entry in path.read_dir()? {
             if let Ok(entry) = entry {
                 if let Ok(name) = entry.file_name().into_string() {
                     if name.starts_with("LICENSE") {
@@ -120,5 +124,26 @@ fn package_license_files(package: &Package) -> Vec<path::PathBuf> {
         }
     }
 
-    result
+    Ok(result)
+}
+
+#[derive(Debug)]
+struct Error;
+
+impl From<failure::Error> for Error {
+    fn from(err: failure::Error) -> Self {
+        cargo_exit(err)
+    }
+}
+
+impl From<io::Error> for Error {
+    fn from(err: io::Error) -> Self {
+        let failure = failure::Error::from_boxed_compat(Box::new(err));
+        cargo_exit(failure)
+    }
+}
+
+fn cargo_exit<E: Into<cargo::CliError>>(err: E) -> ! {
+    let mut shell = cargo::core::shell::Shell::new();
+    cargo::exit_with_error(err.into(), &mut shell)
 }
