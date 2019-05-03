@@ -101,7 +101,11 @@ fn package_licenses(package: &Package) -> Licenses<'_> {
 
     if let Some(ref license_str) = metadata.license {
         let licenses: BTreeSet<&str> = license_str
-            .split('/')
+            .split("OR")
+            .map(|s| s.split("AND"))
+            .flatten()
+            .map(|s| s.split('/'))
+            .flatten()
             .map(str::trim)
             .collect();
         return Licenses::Licenses(licenses);
