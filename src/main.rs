@@ -118,14 +118,15 @@ fn real_main(config: &mut Config, args: Args) -> Result<(), Error> {
         tw.flush()?;
     }
 
-    println!();
+    writeln!(out)?;
+    out.flush()?;
 
     for (name, version, _, license_files) in packages {
         if license_files.is_empty() {
             continue;
         }
 
-        println!("-----BEGIN {} {} LICENSES-----", name, version);
+        writeln!(out, "-----BEGIN {} {} LICENSES-----", name, version)?;
 
         let mut buf = Vec::new();
         let mut licenses_to_print = license_files.len();
@@ -140,10 +141,11 @@ fn real_main(config: &mut Config, args: Args) -> Result<(), Error> {
             }
         }
 
-        println!("-----END {} {} LICENSES-----", name, version);
-        println!();
+        writeln!(out, "-----END {} {} LICENSES-----", name, version)?;
+        writeln!(out)?;
     }
 
+    out.flush()?;
     Ok(())
 }
 
