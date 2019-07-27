@@ -55,6 +55,9 @@ struct Args {
     #[structopt(long = "locked")]
     /// Require Cargo.lock is up to date
     locked: bool,
+    #[structopt(long = "offline")]
+    /// Run without accessing the network
+    offline: bool,
     #[structopt(short = "Z", value_name = "FLAG")]
     /// Unstable (nightly-only) flags to Cargo
     unstable_flags: Vec<String>,
@@ -73,6 +76,7 @@ fn real_main(config: &mut Config, args: Args) -> Result<(), Error> {
         &args.color,
         args.frozen,
         args.locked,
+        args.offline,
         &args.target_dir,
         &args.unstable_flags,
     )?;
