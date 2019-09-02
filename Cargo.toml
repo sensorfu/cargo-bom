@@ -20,7 +20,7 @@ circle-ci = { repository = "sensorfu/cargo-bom", branch = "master" }
 lto = true
 
 [dependencies]
-cargo = "0.37"
+cargo = "0.38"
 failure = "0.1"
-structopt = "0.2"
+structopt = "0.3"
 tabwriter = "1"
