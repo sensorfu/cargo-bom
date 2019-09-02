@@ -11,20 +11,12 @@ use cargo::core::{Package, Resolve, Workspace};
 use cargo::ops;
 use cargo::util::Config;
 use cargo::CargoResult;
-use structopt::clap::AppSettings;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
 #[structopt(bin_name = "cargo")]
 enum Opts {
-    #[structopt(
-        name = "bom",
-        raw(
-            setting = "AppSettings::UnifiedHelpMessage",
-            setting = "AppSettings::DeriveDisplayOrder",
-            setting = "AppSettings::DontCollapseArgsInUsage"
-        )
-    )]
+    #[structopt(name = "bom")]
     /// Display a Bill-of-Materials for Rust project
     Bom(Args),
 }

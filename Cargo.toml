@@ -21,6 +21,6 @@ lto = true
 
 [dependencies]
 cargo = "0.38"
-failure = "0.1"
-structopt = "0.3"
+failure = { version = "0.1", default-features = false }
+structopt = { version = "0.3", default-features = false }
 tabwriter = "1"
