@@ -5,7 +5,8 @@ use std::io::prelude::*;
 use std::path;
 use std::str;
 
-use cargo::core::dependency::Kind;
+use anyhow::Result;
+use cargo::core::dependency::DepKind;
 use cargo::core::package::PackageSet;
 use cargo::core::{Package, Resolve, Workspace};
 use cargo::ops;
@@ -37,7 +38,7 @@ struct Args {
     verbose: u32,
     #[structopt(long = "quiet", short = "q")]
     /// No output printed to stdout other than the tree
-    quiet: Option<bool>,
+    quiet: bool,
     #[structopt(long = "color", value_name = "WHEN")]
     /// Coloring: auto, always, never
     color: Option<String>,
@@ -55,22 +56,23 @@ struct Args {
     unstable_flags: Vec<String>,
 }
 
-fn main() -> Result<(), Error> {
+fn main() -> Result<()> {
     let mut config = Config::default()?;
     let Opts::Bom(args) = Opts::from_args();
     real_main(&mut config, args)
 }
 
-fn real_main(config: &mut Config, args: Args) -> Result<(), Error> {
+fn real_main(config: &mut Config, args: Args) -> Result<()> {
     config.configure(
         args.verbose,
         args.quiet,
-        &args.color,
+        args.color.as_deref(),
         args.frozen,
         args.locked,
         args.offline,
         &args.target_dir,
         &args.unstable_flags,
+        &[],
     )?;
 
     let manifest = args
@@ -151,8 +153,8 @@ fn top_level_dependencies(
         for dependency in member.dependencies() {
             // Filter out Build and Development dependencies
             match dependency.kind() {
-                Kind::Normal => (),
-                Kind::Build | Kind::Development => continue,
+                DepKind::Normal => (),
+                DepKind::Build | DepKind::Development => continue,
             }
             if let Some(dep) = package_ids
                 .package_ids()
@@ -243,7 +245,7 @@ enum Licenses<'a> {
 }
 
 impl<'a> fmt::Display for Licenses<'a> {
-    fn fmt(self: &Self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match *self {
             Licenses::File(_) => write!(f, "Specified in license file"),
             Licenses::Missing => write!(f, "Missing"),
@@ -253,25 +255,4 @@ impl<'a> fmt::Display for Licenses<'a> {
             }
         }
     }
-}
-
-#[derive(Debug)]
-struct Error;
-
-impl From<failure::Error> for Error {
-    fn from(err: failure::Error) -> Self {
-        cargo_exit(err)
-    }
-}
-
-impl From<io::Error> for Error {
-    fn from(err: io::Error) -> Self {
-        let failure = failure::Error::from_boxed_compat(Box::new(err));
-        cargo_exit(failure)
-    }
-}
-
-fn cargo_exit<E: Into<cargo::CliError>>(err: E) -> ! {
-    let mut shell = cargo::core::shell::Shell::new();
-    cargo::exit_with_error(err.into(), &mut shell)
 }
