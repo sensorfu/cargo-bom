@@ -1,6 +1,6 @@
 # Bill of Materials for Rust Crates
 
-[![Crates.io](https://img.shields.io/crates/v/cargo-bom.svg)](https://crates.io/crates/cargo-bom) ![CircleCI (all branches)](https://img.shields.io/circleci/project/github/sensorfu/cargo-bom.svg)
+![Crates.io](https://img.shields.io/crates/v/cargo-bom.svg)
 
 > A Software Bill of Materials (software BOM) is a list of components in a piece
 > of software. Software vendors often create products by assembling open source
