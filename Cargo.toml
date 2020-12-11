@@ -1,6 +1,6 @@
 [package]
 name = "cargo-bom"
-version = "0.4.1"
+version = "0.4.2"
 authors = [ "Ossi Herrala <oherrala@iki.fi>" ]
 license = "MIT"
 edition = "2018"
