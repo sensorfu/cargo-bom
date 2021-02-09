@@ -1,11 +1,11 @@
 Name       | Version  | Licenses
 ----       | -------  | --------
-anyhow     | 1.0.34   | Apache-2.0, MIT
-cargo      | 0.48.0   | Apache-2.0, MIT
-structopt  | 0.3.20   | Apache-2.0, MIT
+anyhow     | 1.0.38   | Apache-2.0, MIT
+cargo      | 0.50.1   | Apache-2.0, MIT
+structopt  | 0.3.21   | Apache-2.0, MIT
 tabwriter  | 1.2.1    | MIT, Unlicense
 
------BEGIN anyhow 1.0.34 LICENSES-----
+-----BEGIN anyhow 1.0.38 LICENSES-----
                               Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
@@ -232,9 +232,9 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
------END anyhow 1.0.34 LICENSES-----
+-----END anyhow 1.0.38 LICENSES-----
 
------BEGIN cargo 0.48.0 LICENSES-----
+-----BEGIN cargo 0.50.1 LICENSES-----
 The Cargo source code itself does not bundle any third party libraries, but it
 depends on a number of libraries which carry their own copyright notices and
 license terms. These libraries are normally all linked static into the binary
@@ -1735,9 +1735,9 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
------END cargo 0.48.0 LICENSES-----
+-----END cargo 0.50.1 LICENSES-----
 
------BEGIN structopt 0.3.20 LICENSES-----
+-----BEGIN structopt 0.3.21 LICENSES-----
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -1962,7 +1962,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
------END structopt 0.3.20 LICENSES-----
+-----END structopt 0.3.21 LICENSES-----
 
 -----BEGIN tabwriter 1.2.1 LICENSES-----
 This is free and unencumbered software released into the public domain.
