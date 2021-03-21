@@ -221,13 +221,11 @@ fn package_license_files(package: &Package) -> io::Result<Vec<path::PathBuf>> {
     let mut result = Vec::new();
 
     if let Some(path) = package.manifest_path().parent() {
-        for entry in path.read_dir()? {
-            if let Ok(entry) = entry {
-                if let Ok(name) = entry.file_name().into_string() {
-                    for license_name in LICENCE_FILE_NAMES {
-                        if name.starts_with(license_name) {
-                            result.push(entry.path())
-                        }
+        for entry in path.read_dir()?.flatten() {
+            if let Ok(name) = entry.file_name().into_string() {
+                for license_name in LICENCE_FILE_NAMES {
+                    if name.starts_with(license_name) {
+                        result.push(entry.path())
                     }
                 }
             }
