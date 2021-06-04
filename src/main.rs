@@ -13,6 +13,7 @@ use cargo::ops;
 use cargo::util::Config;
 use cargo::CargoResult;
 use structopt::StructOpt;
+use tabled::Tabled;
 
 #[derive(StructOpt)]
 #[structopt(bin_name = "cargo")]
@@ -56,6 +57,23 @@ struct Args {
     unstable_flags: Vec<String>,
 }
 
+#[derive(Debug, Tabled, PartialEq, Eq, PartialOrd, Ord)]
+struct DepTable {
+    #[header("Name")]
+    name: String,
+    #[header("Version")]
+    version: String,
+    #[header("Licenses")]
+    licenses: String,
+}
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+struct LicenseTable {
+    name: String,
+    version: String,
+    license_files: BTreeSet<path::PathBuf>,
+}
+
 fn main() -> Result<()> {
     let mut config = Config::default()?;
     let Opts::Bom(args) = Opts::from_args();
@@ -88,58 +106,60 @@ fn real_main(config: &mut Config, args: Args) -> Result<()> {
         top_level_dependencies(&members, package_ids)?
     };
 
-    let mut packages = BTreeSet::new();
+    let mut depencies_list = BTreeSet::new();
+    let mut licenses_list = BTreeSet::new();
+
     for package in &dependencies {
-        let name = package.name().to_owned();
+        let name = package.name().to_string();
         let version = format!("{}", package.version());
         let licenses = format!("{}", package_licenses(package));
         let license_files = package_license_files(package)?;
-        packages.insert((name, version, licenses, license_files));
+        depencies_list.insert(DepTable {
+            name: name.clone(),
+            version: version.clone(),
+            licenses,
+        });
+        licenses_list.insert(LicenseTable {
+            name,
+            version,
+            license_files,
+        });
     }
+
+    let table = tabled::table!(depencies_list, tabled::Style::PseudoClean,);
 
     let stdout = io::stdout();
     let mut out = stdout.lock();
 
-    {
-        let mut tw = tabwriter::TabWriter::new(&mut out);
-        writeln!(tw, "Name\t| Version\t| Licenses")?;
-        writeln!(tw, "----\t| -------\t| --------")?;
-        for (name, version, licenses, _) in &packages {
-            writeln!(tw, "{}\t| {}\t| {}", &name, &version, &licenses)?;
-        }
-
-        // TabWriter flush() makes the actual write to stdout.
-        tw.flush()?;
-    }
-
-    writeln!(out)?;
+    out.write_all(table.as_bytes())?;
     out.flush()?;
 
-    for (name, version, _, license_files) in packages {
+    for LicenseTable {
+        name,
+        version,
+        license_files,
+    } in licenses_list
+    {
         if license_files.is_empty() {
             continue;
         }
 
-        writeln!(out, "-----BEGIN {} {} LICENSES-----", name, version)?;
+        writeln!(out, "\n-----BEGIN {} {} LICENSES-----", name, version)?;
 
-        let mut buf = Vec::new();
         let mut licenses_to_print = license_files.len();
         for file in license_files {
-            let mut fs = std::fs::File::open(file)?;
-            fs.read_to_end(&mut buf)?;
+            let buf = std::fs::read(file)?;
             out.write_all(&buf)?;
-            buf.clear();
             if licenses_to_print > 1 {
                 out.write_all(b"\n-----NEXT LICENSE-----\n")?;
                 licenses_to_print -= 1;
             }
         }
 
-        writeln!(out, "-----END {} {} LICENSES-----", name, version)?;
-        writeln!(out)?;
+        writeln!(out, "\n-----END {} {} LICENSES-----", name, version)?;
+        out.flush()?;
     }
 
-    out.flush()?;
     Ok(())
 }
 
@@ -217,16 +237,19 @@ fn package_licenses(package: &Package) -> Licenses<'_> {
 
 static LICENCE_FILE_NAMES: &[&str] = &["LICENSE", "UNLICENSE"];
 
-fn package_license_files(package: &Package) -> io::Result<Vec<path::PathBuf>> {
-    let mut result = Vec::new();
+fn package_license_files(package: &Package) -> io::Result<BTreeSet<path::PathBuf>> {
+    let mut result = BTreeSet::new();
 
-    if let Some(path) = package.manifest_path().parent() {
-        for entry in path.read_dir()?.flatten() {
-            if let Ok(name) = entry.file_name().into_string() {
-                for license_name in LICENCE_FILE_NAMES {
-                    if name.starts_with(license_name) {
-                        result.push(entry.path())
-                    }
+    let path = package
+        .manifest_path()
+        .parent()
+        .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Package manifest path missing"))?;
+
+    for entry in path.read_dir()?.flatten() {
+        if let Ok(name) = entry.file_name().into_string() {
+            for license_name in LICENCE_FILE_NAMES {
+                if name.starts_with(license_name) {
+                    result.insert(entry.path());
                 }
             }
         }

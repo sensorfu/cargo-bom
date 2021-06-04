@@ -20,4 +20,4 @@ lto = true
 anyhow = "1"
 cargo = "0.50"
 structopt = { version = "0.3", default-features = false }
-tabwriter = "1"
+tabled = "0.1"
