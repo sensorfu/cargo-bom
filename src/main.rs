@@ -245,6 +245,14 @@ fn package_license_files(package: &Package) -> io::Result<BTreeSet<path::PathBuf
         .parent()
         .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Package manifest path missing"))?;
 
+    let metadata = package.manifest().metadata();
+    if let Some(ref license_file) = metadata.license_file {
+        let file = path.join(license_file);
+        if file.exists() {
+            result.insert(file);
+        }
+    }
+
     for entry in path.read_dir()?.flatten() {
         if let Ok(name) = entry.file_name().into_string() {
             for license_name in LICENCE_FILE_NAMES {
