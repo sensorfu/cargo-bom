@@ -5,18 +5,13 @@ name: Rust Stable CI
 jobs:
   ci:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust:
-          - stable
-
     steps:
       - uses: actions/checkout@v1
 
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: ${{ matrix.rust }}
+          toolchain: stable
           override: true
           components: clippy
 
