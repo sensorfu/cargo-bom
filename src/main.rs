@@ -96,7 +96,7 @@ fn real_main(config: &mut Config, args: Args) -> Result<()> {
     let manifest = args
         .manifest_path
         .unwrap_or_else(|| config.cwd().join("Cargo.toml"));
-    let ws = Workspace::new(&manifest, &config)?;
+    let ws = Workspace::new(&manifest, config)?;
     let members: Vec<Package> = ws.members().cloned().collect();
     let (package_ids, resolve) = ops::resolve_ws(&ws)?;
 
@@ -126,7 +126,17 @@ fn real_main(config: &mut Config, args: Args) -> Result<()> {
         });
     }
 
-    let table = tabled::table!(depencies_list, tabled::Style::PseudoClean,);
+    fn make_table(list: BTreeSet<DepTable>) -> String {
+        use tabled::{Alignment, Format, Table, Style, Modify, Row};
+
+        Table::new(list)
+            .with(Style::pseudo_clean())
+            .with(Modify::new(Row(..)).with(Format(|s| { format!("_{}", s) })))
+            .with(Modify::new(Row(..)).with(Alignment::left()))
+            .to_string()
+    }
+
+    let table = make_table(depencies_list);
 
     let stdout = io::stdout();
     let mut out = stdout.lock();
@@ -203,7 +213,7 @@ fn all_dependencies(
 
     for package_id in resolve.iter() {
         let package = package_ids.get_one(package_id)?;
-        if members.contains(&package) {
+        if members.contains(package) {
             // Skip listing our own packages in our workspace
             continue;
         }
