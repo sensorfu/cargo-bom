@@ -127,12 +127,9 @@ fn real_main(config: &mut Config, args: Args) -> Result<()> {
     }
 
     fn make_table(list: BTreeSet<DepTable>) -> String {
-        use tabled::{Alignment, Format, Table, Style, Modify, Row};
-
+        use tabled::{Style, Table};
         Table::new(list)
             .with(Style::pseudo_clean())
-            .with(Modify::new(Row(..)).with(Format(|s| { format!("_{}", s) })))
-            .with(Modify::new(Row(..)).with(Alignment::left()))
             .to_string()
     }
 
