@@ -128,9 +128,7 @@ fn real_main(config: &mut Config, args: Args) -> Result<()> {
 
     fn make_table(list: BTreeSet<DepTable>) -> String {
         use tabled::{Style, Table};
-        Table::new(list)
-            .with(Style::pseudo_clean())
-            .to_string()
+        Table::new(list).with(Style::pseudo_clean()).to_string()
     }
 
     let table = make_table(depencies_list);
