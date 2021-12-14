@@ -224,13 +224,11 @@ fn package_licenses(package: &Package) -> Licenses<'_> {
     if let Some(ref license_str) = metadata.license {
         let licenses: BTreeSet<&str> = license_str
             .split("OR")
-            .map(|s| s.split("AND"))
-            .flatten()
-            .map(|s| s.split('/'))
-            .flatten()
+            .flat_map(|s| s.split("AND"))
+            .flat_map(|s| s.split('/'))
             .map(str::trim)
             .collect();
-        return Licenses::Licenses(licenses);
+        return Licenses::List(licenses);
     }
 
     if let Some(ref license_file) = metadata.license_file {
@@ -273,19 +271,22 @@ fn package_license_files(package: &Package) -> io::Result<BTreeSet<path::PathBuf
 
 #[derive(Debug)]
 enum Licenses<'a> {
-    Licenses(BTreeSet<&'a str>),
+    // Use BTreeSet to get alphabetical order automatically.
+    List(BTreeSet<&'a str>),
     File(&'a str),
     Missing,
 }
+
+use itertools::Itertools;
 
 impl<'a> fmt::Display for Licenses<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match *self {
             Licenses::File(_) => write!(f, "Specified in license file"),
             Licenses::Missing => write!(f, "Missing"),
-            Licenses::Licenses(ref lic_names) => {
-                let lics: Vec<String> = lic_names.iter().map(|s| String::from(*s)).collect();
-                write!(f, "{}", lics.join(", "))
+            Licenses::List(ref lic_names) => {
+                let lics = lic_names.iter().map(ToString::to_string).join(", ");
+                write!(f, "{}", lics)
             }
         }
     }
