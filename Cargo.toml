@@ -1,9 +1,9 @@
 [package]
 name = "cargo-bom"
-version = "0.5.4"
+version = "0.6.0"
 authors = [ "Ossi Herrala <oherrala@iki.fi>" ]
 license = "MIT"
-edition = "2018"
+edition = "2021"
 
 description = "Bill of Materials for Rust Crates"
 homepage = "https://github.com/sensorfu/cargo-bom#readme"
@@ -18,7 +18,7 @@ lto = true
 
 [dependencies]
 anyhow = "1"
-cargo = "0.56"
+cargo = "0.58"
 itertools = "0.10"
 structopt = { version = "0.3", default-features = false }
 tabled = "0.3"
