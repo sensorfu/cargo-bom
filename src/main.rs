@@ -128,7 +128,7 @@ fn real_main(config: &mut Config, args: Args) -> Result<()> {
 
     fn make_table(list: BTreeSet<DepTable>) -> String {
         use tabled::{Style, Table};
-        Table::new(list).with(Style::pseudo_clean()).to_string()
+        Table::new(list).with(Style::PSEUDO_CLEAN).to_string()
     }
 
     let table = make_table(depencies_list);
@@ -238,7 +238,7 @@ fn package_licenses(package: &Package) -> Licenses<'_> {
     Licenses::Missing
 }
 
-static LICENCE_FILE_NAMES: &[&str] = &["LICENSE", "UNLICENSE"];
+static LICENCE_FILE_NAMES: &[&str] = &["LICENSE", "UNLICENSE", "COPYRIGHT"];
 
 fn package_license_files(package: &Package) -> io::Result<BTreeSet<path::PathBuf>> {
     let mut result = BTreeSet::new();
