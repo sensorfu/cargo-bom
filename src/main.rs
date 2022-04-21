@@ -59,11 +59,11 @@ struct Args {
 
 #[derive(Debug, Tabled, PartialEq, Eq, PartialOrd, Ord)]
 struct DepTable {
-    #[header("Name")]
+    #[tabled(rename = "Name")]
     name: String,
-    #[header("Version")]
+    #[tabled(rename = "Version")]
     version: String,
-    #[header("Licenses")]
+    #[tabled(rename = "Licenses")]
     licenses: String,
 }
 
@@ -128,7 +128,7 @@ fn real_main(config: &mut Config, args: Args) -> Result<()> {
 
     fn make_table(list: BTreeSet<DepTable>) -> String {
         use tabled::{Style, Table};
-        Table::new(list).with(Style::PSEUDO_CLEAN).to_string()
+        Table::new(list).with(Style::modern()).to_string()
     }
 
     let table = make_table(depencies_list);
