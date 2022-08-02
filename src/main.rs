@@ -137,6 +137,7 @@ fn real_main(config: &mut Config, args: Args) -> Result<()> {
     let mut out = stdout.lock();
 
     out.write_all(table.as_bytes())?;
+    out.write_all(b"\n")?;
     out.flush()?;
 
     for LicenseTable {
