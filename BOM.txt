@@ -1,18 +1,18 @@
 ┌───────────┬─────────┬─────────────────┐
-│   Name    │ Version │    Licenses     │
+│ Name      │ Version │ Licenses        │
 ├───────────┼─────────┼─────────────────┤
-│  anyhow   │ 1.0.57  │ Apache-2.0, MIT │
+│ anyhow    │ 1.0.59  │ Apache-2.0, MIT │
 ├───────────┼─────────┼─────────────────┤
-│   cargo   │ 0.61.1  │ Apache-2.0, MIT │
+│ cargo     │ 0.63.1  │ Apache-2.0, MIT │
 ├───────────┼─────────┼─────────────────┤
 │ itertools │ 0.10.3  │ Apache-2.0, MIT │
 ├───────────┼─────────┼─────────────────┤
 │ structopt │ 0.3.26  │ Apache-2.0, MIT │
 ├───────────┼─────────┼─────────────────┤
-│  tabled   │  0.7.0  │       MIT       │
+│ tabled    │ 0.8.0   │ MIT             │
 └───────────┴─────────┴─────────────────┘
 
------BEGIN anyhow 1.0.57 LICENSES-----
+-----BEGIN anyhow 1.0.59 LICENSES-----
                               Apache License
                         Version 2.0, January 2004
                      http://www.apache.org/licenses/
@@ -240,9 +240,9 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 
------END anyhow 1.0.57 LICENSES-----
+-----END anyhow 1.0.59 LICENSES-----
 
------BEGIN cargo 0.61.1 LICENSES-----
+-----BEGIN cargo 0.63.1 LICENSES-----
                               Apache License
                         Version 2.0, January 2004
                      https://www.apache.org/licenses/LICENSE-2.0
@@ -1744,7 +1744,7 @@ distributions of Cargo:
     For more information, please refer to <https://unlicense.org/>
 
 
------END cargo 0.61.1 LICENSES-----
+-----END cargo 0.63.1 LICENSES-----
 
 -----BEGIN itertools 0.10.3 LICENSES-----
                               Apache License
@@ -2206,7 +2206,7 @@ SOFTWARE.
 
 -----END structopt 0.3.26 LICENSES-----
 
------BEGIN tabled 0.7.0 LICENSES-----
+-----BEGIN tabled 0.8.0 LICENSES-----
 MIT License
 
 Copyright (c) 2021 Maxim Zhiburt
@@ -2229,4 +2229,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
------END tabled 0.7.0 LICENSES-----
+-----END tabled 0.8.0 LICENSES-----
