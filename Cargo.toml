@@ -21,4 +21,4 @@ anyhow = "1"
 cargo = "0.63"
 itertools = "0.10"
 structopt = { version = "0.3", default-features = false }
-tabled = "0.8"
+tabled = "0.9"
