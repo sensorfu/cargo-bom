@@ -22,16 +22,17 @@ and "UNLICENSE*").
 ```console
 $ cargo bom >BOM.txt
 $ head BOM.txt
-Name       | Version  | Licenses
-----       | -------  | --------
-cargo      | 0.35.0   | Apache-2.0, MIT
-failure    | 0.1.5    | Apache-2.0, MIT
-structopt  | 0.2.15   | Apache-2.0, MIT
-tabwriter  | 1.1.0    | MIT, Unlicense
+┌───────────┬─────────┬─────────────────┐
+│ Name      │ Version │ Licenses        │
+├───────────┼─────────┼─────────────────┤
+│ anyhow    │ 1.0.68  │ Apache-2.0, MIT │
+├───────────┼─────────┼─────────────────┤
+│ cargo     │ 0.67.0  │ Apache-2.0, MIT │
+├───────────┼─────────┼─────────────────┤
+│ itertools │ 0.10.5  │ Apache-2.0, MIT │
+├───────────┼─────────┼─────────────────┤
+│ structopt │ 0.3.26  │ Apache-2.0, MIT │
 
------BEGIN cargo 0.35.0 LICENSES-----
-The Cargo source code itself does not bundle any third party libraries, but it
-depends on a number of libraries which carry their own copyright notices and
 ```
 
 # Bill of Materials
