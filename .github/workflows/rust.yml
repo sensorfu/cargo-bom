@@ -23,7 +23,7 @@ jobs:
           components: rustfmt, clippy
 
       - uses: actions/checkout@v3
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - uses: actions-rs/cargo@v1
         with:
@@ -56,7 +56,7 @@ jobs:
           override: true
 
       - uses: actions/checkout@v3
-      - uses: Swatinem/rust-cache@v1
+      - uses: Swatinem/rust-cache@v2
 
       - uses: actions-rs/cargo@v1
         with:
