@@ -35,6 +35,14 @@ $ head BOM.txt
 
 ```
 
+### Windows
+
+In Windows the output to file can be written via the following PowerShell command:
+
+```powershell
+cargo bom | Out-File -FilePath BOM.txt -Encoding oem
+```
+
 # Bill of Materials
 
 The Bill of Materials for this project can be found from [BOM.txt](./BOM.txt).
