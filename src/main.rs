@@ -127,8 +127,10 @@ fn real_main(config: &mut Config, args: Args) -> Result<()> {
     }
 
     fn make_table(list: BTreeSet<DepTable>) -> String {
-        use tabled::{Style, Table};
-        Table::new(list).with(Style::modern()).to_string()
+        use tabled::settings::{Settings, Style};
+        use tabled::Table;
+        let config = Settings::empty().with(Style::modern());
+        Table::new(list).with(config).to_string()
     }
 
     let table = make_table(depencies_list);
