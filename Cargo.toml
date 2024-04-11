@@ -18,7 +18,7 @@ lto = true
 
 [dependencies]
 anyhow = "1"
-cargo = "0.72"
-itertools = "0.11"
+cargo = "0.75"
+itertools = "0.12"
 structopt = { version = "0.3", default-features = false }
-tabled = "0.14"
+tabled = "0.15"
