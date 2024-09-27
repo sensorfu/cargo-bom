@@ -1,6 +1,6 @@
 [package]
 name = "cargo-bom"
-version = "0.6.8"
+version = "0.7.0"
 authors = [ "Ossi Herrala <oherrala@iki.fi>" ]
 license = "MIT"
 edition = "2021"
@@ -18,7 +18,7 @@ lto = true
 
 [dependencies]
 anyhow = "1"
-cargo = "0.75"
-itertools = "0.12"
-structopt = { version = "0.3", default-features = false }
-tabled = "0.15"
+clap = { version = "4", features = [ "derive" ] }
+cargo_metadata = "0.18"
+itertools = "0.13"
+tabled = "0.16"
