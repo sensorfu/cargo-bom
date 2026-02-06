@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 use std::fmt;
 use std::io::{self, Write};
-use std::path::PathBuf;
+use std::path::Path;
 
 use cargo_metadata::{DependencyKind, camino};
 use tabled::Tabled;
@@ -20,7 +20,7 @@ enum BomCli {
     Bom {
         /// Path to Cargo.toml
         #[arg(long)]
-        manifest_path: Option<PathBuf>,
+        manifest_path: Option<Box<Path>>,
     },
 }
 
@@ -59,18 +59,18 @@ fn main() -> anyhow::Result<()> {
                 }
 
                 let name = dep.name.clone();
-                let version = dep.version.to_string();
-                let licenses = package_licenses(dep).to_string();
+                let version = dep.version.to_string().into_boxed_str();
+                let licenses = package_licenses(dep).to_string().into_boxed_str();
                 let license_files = package_license_files(dep)?;
 
                 depencies_list.insert(DepTable {
-                    name: name.to_string(),
+                    name: name.as_str().into(),
                     version: version.clone(),
                     licenses,
                 });
 
                 licenses_list.insert(LicenseTable {
-                    name: name.to_string(),
+                    name: name.as_str().into(),
                     version,
                     license_files,
                 });
@@ -127,11 +127,11 @@ static LICENCE_FILE_NAMES: &[&str] = &["LICENSE", "UNLICENSE", "COPYRIGHT"];
 #[derive(Debug, Tabled, PartialEq, Eq, PartialOrd, Ord)]
 struct DepTable {
     #[tabled(rename = "Name")]
-    name: String,
+    name: Box<str>,
     #[tabled(rename = "Version")]
-    version: String,
+    version: Box<str>,
     #[tabled(rename = "Licenses")]
-    licenses: String,
+    licenses: Box<str>,
 }
 
 #[derive(Debug)]
@@ -139,7 +139,7 @@ enum Licenses<'a> {
     // Use BTreeSet to get alphabetical order automatically.
     List(BTreeSet<&'a str>),
     #[allow(dead_code)]
-    File(String),
+    File(Box<str>),
     Missing,
 }
 
@@ -168,7 +168,7 @@ fn package_licenses(package: &cargo_metadata::Package) -> Licenses<'_> {
     }
 
     if let Some(ref license_file) = package.license_file() {
-        return Licenses::File(license_file.to_string());
+        return Licenses::File(license_file.to_string().into_boxed_str());
     }
 
     Licenses::Missing
@@ -176,8 +176,8 @@ fn package_licenses(package: &cargo_metadata::Package) -> Licenses<'_> {
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 struct LicenseTable {
-    name: String,
-    version: String,
+    name: Box<str>,
+    version: Box<str>,
     license_files: BTreeSet<camino::Utf8PathBuf>,
 }
 
