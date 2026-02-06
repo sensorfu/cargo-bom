@@ -4,7 +4,6 @@ use std::io::{self, Write};
 use std::path::PathBuf;
 
 use cargo_metadata::{DependencyKind, camino};
-use itertools::Itertools;
 use tabled::Tabled;
 
 use clap::{Parser, Subcommand};
@@ -139,6 +138,7 @@ struct DepTable {
 enum Licenses<'a> {
     // Use BTreeSet to get alphabetical order automatically.
     List(BTreeSet<&'a str>),
+    #[allow(dead_code)]
     File(String),
     Missing,
 }
@@ -149,8 +149,8 @@ impl<'a> fmt::Display for Licenses<'a> {
             Licenses::File(_) => write!(f, "Specified in license file"),
             Licenses::Missing => write!(f, "Missing"),
             Licenses::List(ref lic_names) => {
-                let lics = lic_names.iter().map(ToString::to_string).join(", ");
-                write!(f, "{}", lics)
+                let lics: Vec<String> = lic_names.iter().map(ToString::to_string).collect();
+                write!(f, "{}", lics.join(", "))
             }
         }
     }
