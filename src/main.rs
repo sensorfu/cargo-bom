@@ -3,7 +3,7 @@ use std::fmt;
 use std::io::{self, Write};
 use std::path::PathBuf;
 
-use cargo_metadata::{camino, DependencyKind};
+use cargo_metadata::{DependencyKind, camino};
 use itertools::Itertools;
 use tabled::Tabled;
 
@@ -65,13 +65,13 @@ fn main() -> anyhow::Result<()> {
                 let license_files = package_license_files(dep)?;
 
                 depencies_list.insert(DepTable {
-                    name: name.clone(),
+                    name: name.to_string(),
                     version: version.clone(),
                     licenses,
                 });
 
                 licenses_list.insert(LicenseTable {
-                    name,
+                    name: name.to_string(),
                     version,
                     license_files,
                 });
@@ -80,8 +80,8 @@ fn main() -> anyhow::Result<()> {
     }
 
     fn make_table(list: BTreeSet<DepTable>) -> String {
-        use tabled::settings::{Settings, Style};
         use tabled::Table;
+        use tabled::settings::{Settings, Style};
         let config = Settings::empty().with(Style::modern());
         Table::new(list).with(config).to_string()
     }
