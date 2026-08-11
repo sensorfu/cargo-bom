@@ -57,7 +57,10 @@ jobs:
   rust-matrix:
     strategy:
       matrix:
-        toolchain: [ beta, nightly ]
+        toolchain:
+          - beta
+          - nightly
+          - 1.91.1 # MSRV
         allow_fail: [ false ]
         include:
           - toolchain: nightly
